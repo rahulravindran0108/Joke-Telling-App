@@ -3,6 +3,7 @@ package com.udacity.gradle.builditbigger;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -49,39 +50,29 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void tellJoke(View view){
-        new FetchJokeTask().execute(this);
+    public void tellJoke(View view) {
+        new FetchAndDisplayJokeTask(this).execute();
     }
 
-    private static class FetchJokeTask extends AsyncTask<Context, Void, String> {
-        private static Libjoke myApiService = null;
-        private Context mContext;
 
-        @Override
-        protected final String doInBackground(Context... context) {
-            if(myApiService == null) {  // Only do this once
-                Libjoke.Builder builder = new Libjoke.Builder(AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(), null)
-                        .setRootUrl("https://chrome-duality-427.appspot.com//_ah/api/");
-                myApiService = builder.build();
-            }
+    private static class FetchAndDisplayJokeTask extends FetchJokeTask {
+        private final Context mContext;
 
-            mContext = context[0];
-            try {
-                return myApiService.getRandomJoke().execute().getData();
-            } catch (IOException e) {
-                return e.getMessage();
-            }
+        public FetchAndDisplayJokeTask(Context context) {
+            mContext = context;
         }
 
         @Override
-        protected void onPostExecute(String jokeText) {
+        protected void onPostExecute(@Nullable String jokeText) {
+            if (jokeText == null) {
+                Toast.makeText(mContext, "Error fetching joke", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent viewJokeIntent = new Intent(mContext, ViewJokeActivity.class);
             viewJokeIntent.putExtra(ViewJokeActivity.INTENT_JOKE, jokeText);
             mContext.startActivity(viewJokeIntent);
         }
+
     }
-
-
-
 }
+
