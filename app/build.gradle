@@ -17,6 +17,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    productFlavors {
+        free { }
+        paid {
+            applicationIdSuffix ".paid"
+        }
+    }
+    
 }
 
 dependencies {
@@ -28,4 +36,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.0'
     compile 'com.google.android.gms:play-services:9.0.2'
     compile project(path: ':backend', configuration: 'android-endpoints')
+    freeCompile 'com.google.android.gms:play-services-ads:9.0.2'
 }
